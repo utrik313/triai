@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Fashion Recommendation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <main class="container">
+    <header class="hero glass">
+      <p class="eyebrow">AI STYLE STUDIO</p>
+      <h1>AI-Powered Fashion Recommendation</h1>
+      <p class="subtitle">Upload your photo and receive a polished style analysis with personalized color stories and realistic virtual try-on previews.</p>
+    </header>
+
+    <section class="panel glass">
+      <div class="field-grid">
+        <div>
+          <label for="imageInput">Upload Image</label>
+          <input id="imageInput" type="file" accept="image/*" />
+        </div>
+        <div>
+          <label for="gender">Style profile</label>
+          <select id="gender">
+            <option value="female">Feminine Palette</option>
+            <option value="male">Masculine Palette</option>
+            <option value="neutral">Neutral Palette</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="analyzeBtn">Analyze & Recommend</button>
+        <button id="demoBtn" type="button">Use Demo Image</button>
+      </div>
+    </section>
+
+    <section id="results" class="hidden results-wrap">
+      <section class="glass section-card">
+        <h2>Detailed Style Analysis Summary</h2>
+        <div class="grid">
+          <article><h3>Body Type</h3><p id="bodyType"></p></article>
+          <article><h3>Body Proportions</h3><p id="bodyProportion"></p></article>
+          <article><h3>Face Shape</h3><p id="faceShape"></p></article>
+          <article><h3>Skin Tone / Face Color</h3><p id="skinTone"></p></article>
+          <article><h3>Overall Color Profile</h3><p id="colorProfile"></p></article>
+        </div>
+      </section>
+
+      <section class="glass section-card">
+        <h2>Personalized Color Recommendations</h2>
+        <div id="palette"></div>
+        <ol id="outfitList" class="outfit-list"></ol>
+      </section>
+
+      <section class="glass section-card">
+        <h2>Virtual Try-On Previews</h2>
+        <div id="tryOnGrid" class="tryon-grid"></div>
+      </section>
+    </section>
+
+    <img id="sourcePreview" class="source-preview hidden" alt="Uploaded preview" />
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
