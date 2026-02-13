@@ -9,17 +9,26 @@ const outfitDB = {
   female: [
     { name: 'Elegant Contrast', desc: 'Cream blouse + navy trousers + gold accents', top: [243,233,214], bottom:[35,55,97], accent:[209,169,84] },
     { name: 'Soft Chic', desc: 'Dusty rose top + charcoal skirt + pearl accents', top: [201,142,151], bottom:[64,68,73], accent:[220,219,214] },
-    { name: 'Fresh Minimal', desc: 'Sage shirt + sand pants + bronze accents', top: [147,170,146], bottom:[210,191,158], accent:[135,99,63] }
+    { name: 'Fresh Minimal', desc: 'Sage shirt + sand pants + bronze accents', top: [147,170,146], bottom:[210,191,158], accent:[135,99,63] },
+    { name: 'Runway Noir', desc: 'Black satin top + mocha wide-leg pants + champagne accents', top: [43,42,47], bottom:[123,104,90], accent:[222,198,160] },
+    { name: 'Pastel Bloom', desc: 'Lavender knit + ivory skirt + rose-gold accents', top: [171,154,196], bottom:[237,232,218], accent:[193,141,125] },
+    { name: 'City Luxe', desc: 'Cocoa blazer + blush trousers + bronze accents', top: [112,86,74], bottom:[207,173,169], accent:[152,107,73] }
   ],
   male: [
     { name: 'Urban Smart', desc: 'Steel blue shirt + black chinos + tan accents', top: [82,109,133], bottom:[37,40,45], accent:[175,128,84] },
     { name: 'Classic Refined', desc: 'Ivory shirt + navy trousers + burgundy accents', top: [240,234,221], bottom:[32,55,90], accent:[120,41,56] },
-    { name: 'Modern Earth', desc: 'Olive jacket + stone pants + rust accents', top: [102,119,71], bottom:[194,183,161], accent:[165,87,56] }
+    { name: 'Modern Earth', desc: 'Olive jacket + stone pants + rust accents', top: [102,119,71], bottom:[194,183,161], accent:[165,87,56] },
+    { name: 'Executive Slate', desc: 'Slate blazer + graphite pants + cobalt accents', top: [92,102,114], bottom:[58,63,70], accent:[56,89,146] },
+    { name: 'Weekend Linen', desc: 'Sand shirt + olive chinos + cognac accents', top: [211,198,171], bottom:[105,116,81], accent:[166,108,67] },
+    { name: 'Midnight Edge', desc: 'Charcoal shirt + ink pants + silver accents', top: [79,84,92], bottom:[33,39,50], accent:[182,186,194] }
   ],
   neutral: [
     { name: 'Balanced Monochrome', desc: 'Warm gray top + deep gray bottom + silver accents', top: [160,157,152], bottom:[78,81,84], accent:[181,185,190] },
     { name: 'Cool Harmony', desc: 'Muted teal top + slate bottom + soft white accents', top: [92,135,137], bottom:[71,84,94], accent:[233,236,238] },
-    { name: 'Natural Blend', desc: 'Clay top + olive bottom + beige accents', top: [180,128,102], bottom:[97,108,80], accent:[224,208,183] }
+    { name: 'Natural Blend', desc: 'Clay top + olive bottom + beige accents', top: [180,128,102], bottom:[97,108,80], accent:[224,208,183] },
+    { name: 'Studio Minimal', desc: 'Stone shirt + deep taupe trousers + pewter accents', top: [174,167,154], bottom:[99,90,84], accent:[151,154,160] },
+    { name: 'Aurora Street', desc: 'Muted plum top + ash bottoms + icy accents', top: [125,103,133], bottom:[112,117,126], accent:[203,216,224] },
+    { name: 'Gallery Soft', desc: 'Dust blue top + mushroom pants + cream accents', top: [136,153,170], bottom:[141,128,116], accent:[234,225,210] }
   ]
 };
 
@@ -28,7 +37,7 @@ function avgRGB(data, startX, startY, width, height, canvasWidth) {
   for (let y = startY; y < startY + height; y += 2) {
     for (let x = startX; x < startX + width; x += 2) {
       const idx = (y * canvasWidth + x) * 4;
-      r += data[idx]; g += data[idx+1]; b += data[idx+2];
+      r += data[idx]; g += data[idx + 1]; b += data[idx + 2];
       count++;
     }
   }
@@ -59,6 +68,31 @@ function classifyColorProfile(palette) {
   if (avg > 0.42) return 'High-contrast vibrant';
   if (avg > 0.25) return 'Balanced natural';
   return 'Soft muted';
+}
+
+function colorDistance(c1, c2) {
+  return Math.sqrt(
+    ((c1[0] - c2[0]) ** 2) +
+    ((c1[1] - c2[1]) ** 2) +
+    ((c1[2] - c2[2]) ** 2)
+  );
+}
+
+function scoreOutfitForPalette(outfit, palette) {
+  const outfitColors = [outfit.top, outfit.bottom, outfit.accent];
+  const bestMatches = outfitColors.map((oc) => {
+    return Math.min(...palette.map((pc) => colorDistance(oc, pc)));
+  });
+  return bestMatches.reduce((a, v) => a + v, 0) / bestMatches.length;
+}
+
+function pickTopOutfitsByProfile(profileKey, palette, count = 3) {
+  const options = outfitDB[profileKey] || outfitDB.neutral;
+  return [...options]
+    .map((o) => ({ outfit: o, score: scoreOutfitForPalette(o, palette) }))
+    .sort((a, b) => a.score - b.score)
+    .slice(0, count)
+    .map((r) => r.outfit);
 }
 
 function drawPath(ctx, points) {
@@ -174,7 +208,7 @@ function processImage(img) {
     paletteDiv.appendChild(swatch);
   });
 
-  const outfits = outfitDB[genderSelect.value];
+  const outfits = pickTopOutfitsByProfile(genderSelect.value, palette, 3);
   const outfitList = document.getElementById('outfitList');
   outfitList.innerHTML = '';
   outfits.forEach((o) => {
